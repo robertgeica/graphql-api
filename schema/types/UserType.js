@@ -1,4 +1,9 @@
-const { GraphQLObjectType, GraphQLID, GraphQLString } = require('graphql');
+const {
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLString,
+  GraphQLNonNull,
+} = require('graphql');
 
 const UserInputType = new GraphQLObjectType({
   name: 'UserInput',
@@ -19,4 +24,13 @@ const UserType = new GraphQLObjectType({
   }),
 });
 
-module.exports = { UserInputType, UserType };
+const AuthToken = new GraphQLObjectType({
+  name: 'AuthToken',
+  fields: () => ({
+    id: { type: GraphQLID },
+    email: { type: GraphQLNonNull(GraphQLString) },
+    token: { type: GraphQLNonNull(GraphQLString) },
+  }),
+});
+
+module.exports = { UserInputType, UserType, AuthToken };
