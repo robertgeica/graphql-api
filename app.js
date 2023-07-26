@@ -4,7 +4,7 @@ const { graphqlHTTP } = require('express-graphql');
 const { GraphQLSchema } = require('graphql');
 const { connectDatabase } = require('./database/mongodb');
 const { mutation } = require('./schema/mutations/mutations');
-const { queries } = require('./schema/queriess/queries');
+const { queries } = require('./schema/queries/queries');
 
 const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.BASE_URL || 'http://localhost';
