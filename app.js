@@ -5,6 +5,7 @@ const { GraphQLSchema } = require('graphql');
 const { connectDatabase } = require('./database/mongodb');
 const { mutation } = require('./schema/mutations/mutations');
 const { queries } = require('./schema/queries/queries');
+const { authMiddleware } = require('./middlewares/authMiddleware');
 
 const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.BASE_URL || 'http://localhost';
@@ -12,6 +13,8 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost';
 const app = express();
 
 connectDatabase();
+
+app.use(authMiddleware);
 
 app.use(
   '/graphql',
