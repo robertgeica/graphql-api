@@ -18,6 +18,16 @@ const queries = new GraphQLObjectType({
         return User.findById(args.id);
       },
     },
+    loggedUser: {
+      type: UserType,
+      resolve(parent, args, { userId }) {
+        if(!userId) {
+          throw new Error('Unauthorized access. Please log in.');
+        }
+
+        return User.findById(userId);
+      },
+    },
   },
 });
 
