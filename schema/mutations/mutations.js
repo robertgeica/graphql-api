@@ -1,6 +1,6 @@
 const { GraphQLObjectType, GraphQLNonNull, GraphQLString } = require('graphql');
 const User = require('../../models/User');
-const { UserInputType } = require('../types/UserType');
+const { UserInputType, AuthToken } = require('../types/UserType');
 
 const mutation = new GraphQLObjectType({
   name: 'UserMutations',
@@ -19,6 +19,30 @@ const mutation = new GraphQLObjectType({
           password: args.password,
         });
         return user.save();
+      },
+    },
+    login: {
+      type: AuthToken,
+      args: {
+        email: { type: GraphQLNonNull(GraphQLString) },
+        password: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve: async (parent, args) => {
+        const { email, password } = args;
+        const user = await User.findOne({ email });
+
+        const isPasswordMatch = await user?.matchPasswords(password);
+        if (!user || !isPasswordMatch) {
+          throw new Error('Invalid credentials or inexistent user');
+        }
+
+        const token = user.getSignedJwtToken();
+        console.log(email, token);
+        return {
+          id: user.id,
+          email,
+          token,
+        };
       },
     },
   },
