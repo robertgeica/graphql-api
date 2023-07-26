@@ -3,7 +3,7 @@ const User = require('../../models/User');
 const { UserInputType } = require('../types/UserType');
 
 const mutation = new GraphQLObjectType({
-  name: 'Mutation',
+  name: 'UserMutations',
   fields: {
     addUser: {
       type: UserInputType,
