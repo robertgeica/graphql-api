@@ -1,5 +1,7 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLString } = require('graphql');
+const { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLEnumType, GraphQLID } = require('graphql');
+const Note = require('../../models/Note');
 const User = require('../../models/User');
+const { NoteType } = require('../types/NoteType');
 const { UserInputType, AuthToken, UserType } = require('../types/UserType');
 
 const mutation = new GraphQLObjectType({
@@ -75,6 +77,39 @@ const mutation = new GraphQLObjectType({
           },
           { new: true }
         );
+      },
+    },
+
+    // notes
+    addNote: {
+      type: NoteType,
+      args: {
+        title: { type: GraphQLNonNull(GraphQLString) },
+        content: { type: GraphQLNonNull(GraphQLString) },
+        visibility: {
+          type: new GraphQLEnumType({
+            name: 'NoteVisibility',
+            values: {
+              public: { value: 'Public' },
+              private: { value: 'Private' },
+            },
+          }),
+          defaultValue: 'Public',
+        }
+      },
+      resolve(parent, args, { userId }) {
+        if (!userId) {
+          throw new Error('Unauthorized access. Please log in.');
+        }
+
+        const note = new Note({
+          title: args.title,
+          content: args.content,
+          visibility: args.visibility,
+          userId,
+        });
+
+        return note.save();
       },
     },
   },
