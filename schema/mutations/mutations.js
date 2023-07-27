@@ -125,10 +125,47 @@ const mutation = new GraphQLObjectType({
         const note = await Note.findById(args.id);
 
         if (!userId || userId !== note.userId.toString()) {
-          throw new Error('Unauthorized access. Please log in.');
+          throw new Error('Unauthorized action.');
         }
 
         return await Note.findByIdAndDelete(args.id);
+      },
+    },
+    updateNote: {
+      type: NoteType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+
+        title: { type: GraphQLString },
+        content: { type: GraphQLString },
+        visibility: {
+          type: new GraphQLEnumType({
+            name: 'NoteVisibilityUpdate',
+            values: {
+              public: { value: 'Public' },
+              private: { value: 'Private' },
+            },
+          }),
+        },
+      },
+      resolve: async (parent, args, { userId }) => {
+        const note = await Note.findById(args.id);
+
+        if (!userId || userId !== note.userId.toString()) {
+          throw new Error('Unauthorized action.');
+        }
+
+        return Note.findByIdAndUpdate(
+          args.id,
+          {
+            $set: {
+              title: args.title,
+              content: args.content,
+              visibility: args.visibility,
+            },
+          },
+          { new: true }
+        );
       },
     },
   },
