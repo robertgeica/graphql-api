@@ -45,7 +45,6 @@ const queries = new GraphQLObjectType({
         if (note.visibility === 'Public') {
           return note;
         }
-        console.log(userId, note.userId);
         if (!userId || userId !== note.userId.toString()) {
           throw new Error(
             'Unauthorized access. You must be the author to access a private note.'
@@ -58,12 +57,12 @@ const queries = new GraphQLObjectType({
     userNotes: {
       type: new GraphQLList(NoteType),
       resolve(parent, args, { userId }) {
-        if(!userId) {
-          throw new Error("You must login first.")
+        if (!userId) {
+          throw new Error('You must login first.');
         }
         return Note.find({ userId: { $eq: userId } });
       },
-    }
+    },
   },
 });
 

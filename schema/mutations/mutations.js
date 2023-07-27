@@ -1,4 +1,10 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLEnumType, GraphQLID } = require('graphql');
+const {
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLEnumType,
+  GraphQLID,
+} = require('graphql');
 const Note = require('../../models/Note');
 const User = require('../../models/User');
 const { NoteType } = require('../types/NoteType');
@@ -95,7 +101,7 @@ const mutation = new GraphQLObjectType({
             },
           }),
           defaultValue: 'Public',
-        }
+        },
       },
       resolve(parent, args, { userId }) {
         if (!userId) {
@@ -110,6 +116,19 @@ const mutation = new GraphQLObjectType({
         });
 
         return note.save();
+      },
+    },
+    deleteNote: {
+      type: NoteType,
+      args: { id: { type: GraphQLNonNull(GraphQLID) } },
+      resolve: async (parent, args, { userId }) => {
+        const note = await Note.findById(args.id);
+
+        if (!userId || userId !== note.userId.toString()) {
+          throw new Error('Unauthorized access. Please log in.');
+        }
+
+        return await Note.findByIdAndDelete(args.id);
       },
     },
   },
