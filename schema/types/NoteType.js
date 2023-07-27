@@ -5,7 +5,7 @@ const {
   GraphQLNonNull,
 } = require('graphql');
 const { UserType } = require('./UserType');
-
+const User = require('../../models/User');
 
 const NoteType = new GraphQLObjectType({
   name: 'NoteType',
@@ -16,13 +16,11 @@ const NoteType = new GraphQLObjectType({
     visibility: { type: GraphQLString },
     user: {
       type: UserType,
-      ressolve(parent, args) {
-        return User.FindById(parent.userId);
-      }
-      
-    }
+      resolve(parent, args) {
+        return User.findById(parent.userId);
+      },
+    },
   }),
 });
-
 
 module.exports = { NoteType };
