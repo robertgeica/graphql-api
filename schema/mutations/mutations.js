@@ -1,6 +1,6 @@
 const { GraphQLObjectType, GraphQLNonNull, GraphQLString } = require('graphql');
 const User = require('../../models/User');
-const { UserInputType, AuthToken } = require('../types/UserType');
+const { UserInputType, AuthToken, UserType } = require('../types/UserType');
 
 const mutation = new GraphQLObjectType({
   name: 'UserMutations',
@@ -43,6 +43,38 @@ const mutation = new GraphQLObjectType({
           email,
           token,
         };
+      },
+    },
+    deleteUser: {
+      type: UserType,
+      args: {},
+      resolve(parent, args, { userId }) {
+        if (!userId) {
+          throw new Error('Unauthorized access. Please log in.');
+        }
+
+        return User.findByIdAndDelete(userId);
+      },
+    },
+    updateUser: {
+      type: UserType,
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args, { userId }) {
+        if (!userId) {
+          throw new Error('Unauthorized access. Please log in.');
+        }
+
+        return User.findByIdAndUpdate(
+          userId,
+          {
+            $set: {
+              name: args.name,
+            },
+          },
+          { new: true }
+        );
       },
     },
   },
